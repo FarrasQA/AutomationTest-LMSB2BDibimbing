@@ -1,1 +1,0 @@
-{"uuid":"8ef52cc4-bdcf-4b1f-aebe-e0c46c2cf78d","name":"RegressionUiSuite","children":["eb1b2d5c-4e24-4da4-b371-acb734f202a6"],"befores":[{"name":"loadConfig","status":"passed","stage":"finished","description":"","steps":[],"attachments":[],"parameters":[],"start":1778927327907,"stop":1778927327913}],"afters":[],"start":1778927327887,"stop":1778927931612}

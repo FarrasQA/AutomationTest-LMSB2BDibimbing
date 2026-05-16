@@ -1,1 +1,0 @@
-{"uuid":"09082884-69cc-4fa3-92e9-93b26faa0725","name":"SmokeTestSuite","children":["7a2ff310-e201-41f1-918b-7f2f39298f04"],"befores":[{"name":"authenticate","status":"passed","stage":"finished","description":"","steps":[],"attachments":[],"parameters":[],"start":1778941007506,"stop":1778941011641}],"afters":[],"start":1778941007465,"stop":1778941012940}
