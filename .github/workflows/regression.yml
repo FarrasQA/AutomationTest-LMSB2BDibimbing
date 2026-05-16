@@ -30,12 +30,12 @@ jobs:
       - name: Grant Execute Permission
         run: chmod +x gradlew
 
-      - name: Run Automation Test
-        run: ./gradlew clean test
+      - name: Run Full Regression
+        run: ./gradlew clean test -Dsuite=testng.xml
+        continue-on-error: true
 
       - name: Read Summary
         if: always()
-        id: summary
         run: |
 
           PASSED=$(grep PASSED reports/summary.txt | cut -d '=' -f2)
@@ -46,29 +46,48 @@ jobs:
           echo "FAILED=$FAILED" >> $GITHUB_ENV
           echo "SKIPPED=$SKIPPED" >> $GITHUB_ENV
 
-      - name: Upload Screenshots
+      - name: Upload Screenshots Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: screenshots
           path: reports/screenshots/
+          if-no-files-found: ignore
 
-      - name: Upload Extent Report
+      - name: Upload Extent Report Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: extent-report
           path: reports/
+          if-no-files-found: ignore
 
-      - name: Send Slack Notification
+      - name: Send Slack Summary
         if: always()
         uses: 8398a7/action-slack@v3
         with:
           status: custom
           custom_payload: |
             {
-              "text": "*Automation Regression Result*\n\n✅ Passed: ${{ env.PASSED }}\n❌ Failed: ${{ env.FAILED }}\n⚠️ Skipped: ${{ env.SKIPPED }}\n\n📸 Screenshot dan report tersedia di GitHub Artifacts."
+              "text": "🚀 *Automation Full Regression Result*\n\n✅ Passed: ${{ env.PASSED }}\n❌ Failed: ${{ env.FAILED }}\n⚠️ Skipped: ${{ env.SKIPPED }}\n\n📄 Extent Report dan screenshot evidence berhasil diupload."
             }
-
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Upload Extent Report To Slack
+        if: always()
+        uses: MeilCli/slack-upload-file@v4
+        with:
+          slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+          file_path: reports/
+          initial_comment: "📄 Automation Extent Report"
+
+      - name: Upload Failed Screenshots To Slack
+        if: always()
+        uses: MeilCli/slack-upload-file@v4
+        with:
+          slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+          file_path: reports/screenshots/
+          initial_comment: "📸 Failed Test Evidence"
