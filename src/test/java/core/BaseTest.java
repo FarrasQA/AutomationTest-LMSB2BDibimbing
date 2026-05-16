@@ -1,6 +1,8 @@
 package core;
 
+import org.openqa.selenium.WebDriver;
 import org.testng.annotations.*;
+
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.Properties;
@@ -9,60 +11,52 @@ public class BaseTest {
 
     protected static Properties config;
 
+    protected WebDriver driver;
+
     @BeforeSuite(alwaysRun = true)
     public void loadConfig() {
 
         try {
+
             config = new Properties();
 
             InputStream input = getClass()
                     .getClassLoader()
-                    .getResourceAsStream("config/config.properties");
+                    .getResourceAsStream("config/staging.properties");
 
             if (input == null) {
-                throw new RuntimeException("config.properties NOT FOUND");
+                throw new RuntimeException("staging.properties NOT FOUND");
             }
 
             config.load(input);
 
-            System.out.println("SUCCESS LOAD CONFIG");
-
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load config.properties", e);
+            throw new RuntimeException(e);
         }
     }
 
-    @BeforeMethod(alwaysRun = true)
     @Parameters({"browser"})
+    @BeforeMethod(alwaysRun = true)
     public void setUp(@Optional("chrome") String browser) {
 
         DriverManager.initializeDriver(browser);
 
-        DriverManager.getDriver().manage().window().maximize();
+        driver = DriverManager.getDriver();
 
-        String baseUrl = config.getProperty("base.url");
+        driver.manage().window().maximize();
 
-        if (baseUrl == null || baseUrl.isEmpty()) {
-            throw new RuntimeException("base.url kosong di config.properties");
-        }
-
-        DriverManager.getDriver()
-                .manage()
+        driver.manage()
                 .timeouts()
-                .implicitlyWait(Duration.ofSeconds(10));
+                .pageLoadTimeout(Duration.ofSeconds(30));
 
-        DriverManager.getDriver().get(baseUrl);
+        driver.get(config.getProperty("baseUrl"));
 
-        System.out.println("OPEN URL: " + baseUrl);
+        System.out.println("OPEN URL: " + config.getProperty("baseUrl"));
     }
 
     @AfterMethod(alwaysRun = true)
     public void tearDown() {
 
         DriverManager.quitDriver();
-    }
-
-    public static Properties getConfig() {
-        return config;
     }
 }

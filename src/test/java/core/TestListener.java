@@ -204,6 +204,7 @@ public class TestListener implements ITestListener {
         attachScreenshot(testName, "FAILED");
 
         if (throwable != null) {
+
             extentTest.get().log(
                     Status.FAIL,
                     throwable
@@ -255,12 +256,24 @@ public class TestListener implements ITestListener {
             String status
     ) {
 
-        WebDriver driver = DriverManager.getDriver();
+        WebDriver driver =
+                DriverManager.getDriverOrNull();
 
+        // HANDLE API TEST
         if (driver == null) {
+
             log.warn(
-                    "WebDriver null. Screenshot skipped."
+                    "WebDriver is NULL. Screenshot skipped for API test."
             );
+
+            if (extentTest.get() != null) {
+
+                extentTest.get().log(
+                        Status.INFO,
+                        "Screenshot skipped because no UI driver initialized"
+                );
+            }
+
             return;
         }
 

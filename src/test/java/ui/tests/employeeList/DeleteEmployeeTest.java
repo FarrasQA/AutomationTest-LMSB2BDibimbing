@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import ui.pages.employeeList.DeleteEmployee;
-import ui.test.employeeList.EmployeeBaseTest;
+
 
 public class DeleteEmployeeTest extends EmployeeBaseTest{
 

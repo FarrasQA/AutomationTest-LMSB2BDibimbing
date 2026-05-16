@@ -7,7 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import ui.pages.employeeList.EditEmployee;
 import ui.pages.employeeMenu.EmployeeMenu;
-import ui.test.employeeList.EmployeeBaseTest;
+
 
 public class EditEmployeeTest extends EmployeeBaseTest {
 

@@ -4,14 +4,14 @@
         <listener class-name="core.TestListener"/>
     </listeners>
     <parameter name="browser" value="chrome"/>
-    <test name="FilterByAngkatanTest">
+    <test name="CreateDivisionTest">
         <groups>
             <run>
                 <include name="smoke"/>
             </run>
         </groups>
         <classes>
-            <class name="ui.tests.employeeList.FilterByAngkatanTest"/>
+            <class name="api.tests.division.CreateDivisionTest"/>
         </classes>
     </test>
 </suite>

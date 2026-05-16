@@ -1,0 +1,74 @@
+name: Automation Regression Test
+
+on:
+
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 17 * * *'
+
+jobs:
+
+  automation-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Grant Execute Permission
+        run: chmod +x gradlew
+
+      - name: Run Automation Test
+        run: ./gradlew clean test
+
+      - name: Read Summary
+        if: always()
+        id: summary
+        run: |
+
+          PASSED=$(grep PASSED reports/summary.txt | cut -d '=' -f2)
+          FAILED=$(grep FAILED reports/summary.txt | cut -d '=' -f2)
+          SKIPPED=$(grep SKIPPED reports/summary.txt | cut -d '=' -f2)
+
+          echo "PASSED=$PASSED" >> $GITHUB_ENV
+          echo "FAILED=$FAILED" >> $GITHUB_ENV
+          echo "SKIPPED=$SKIPPED" >> $GITHUB_ENV
+
+      - name: Upload Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: reports/screenshots/
+
+      - name: Upload Extent Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report
+          path: reports/
+
+      - name: Send Slack Notification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "text": "*Automation Regression Result*\n\n✅ Passed: ${{ env.PASSED }}\n❌ Failed: ${{ env.FAILED }}\n⚠️ Skipped: ${{ env.SKIPPED }}\n\n📸 Screenshot dan report tersedia di GitHub Artifacts."
+            }
+
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

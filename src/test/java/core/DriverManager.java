@@ -4,6 +4,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import java.time.Duration;
@@ -16,7 +17,11 @@ public class DriverManager {
     public static void initializeDriver(String browser) {
 
         if (driver.get() != null) {
-            System.out.println("Using existing driver session");
+
+            System.out.println(
+                    "Driver already initialized for this thread"
+            );
+
             return;
         }
 
@@ -30,9 +35,13 @@ public class DriverManager {
 
             case "chrome" -> {
 
-                boolean isCI = "true".equalsIgnoreCase(System.getenv("GITHUB_ACTIONS"));
+                boolean isCI =
+                        "true".equalsIgnoreCase(
+                                System.getenv("GITHUB_ACTIONS")
+                        );
 
-                ChromeOptions options = new ChromeOptions();
+                ChromeOptions options =
+                        new ChromeOptions();
 
                 options.addArguments("--start-maximized");
                 options.addArguments("--disable-notifications");
@@ -40,6 +49,7 @@ public class DriverManager {
                 options.addArguments("--disable-extensions");
 
                 if (isCI) {
+
                     options.addArguments("--headless=new");
                     options.addArguments("--no-sandbox");
                     options.addArguments("--disable-dev-shm-usage");
@@ -48,17 +58,25 @@ public class DriverManager {
                 }
 
                 WebDriverManager.chromedriver().setup();
-                webDriver = new ChromeDriver(options);
+
+                webDriver =
+                        new ChromeDriver(options);
             }
 
             case "firefox" -> {
+
                 WebDriverManager.firefoxdriver().setup();
-                webDriver = new FirefoxDriver();
+
+                webDriver =
+                        new FirefoxDriver();
             }
 
             case "edge" -> {
+
                 WebDriverManager.edgedriver().setup();
-                webDriver = new org.openqa.selenium.edge.EdgeDriver();
+
+                webDriver =
+                        new EdgeDriver();
             }
 
             default -> throw new IllegalArgumentException(
@@ -68,26 +86,62 @@ public class DriverManager {
 
         driver.set(webDriver);
 
-        getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
-        getDriver().manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
-        getDriver().manage().timeouts().scriptTimeout(Duration.ofSeconds(30));
+        getDriver()
+                .manage()
+                .timeouts()
+                .implicitlyWait(Duration.ofSeconds(3));
 
-        System.out.println("Driver initialized successfully");
+        getDriver()
+                .manage()
+                .timeouts()
+                .pageLoadTimeout(Duration.ofSeconds(60));
+
+        getDriver()
+                .manage()
+                .timeouts()
+                .scriptTimeout(Duration.ofSeconds(30));
+
+        System.out.println(
+                "Driver initialized successfully"
+        );
     }
 
     public static WebDriver getDriver() {
+
+        WebDriver drv = driver.get();
+
+        if (drv == null) {
+
+            throw new RuntimeException(
+                    "Driver is NULL. Please call initializeDriver() in BaseTest first."
+            );
+        }
+
+        return drv;
+    }
+
+    // TAMBAHAN BARU UNTUK API AUTOMATION
+    public static WebDriver getDriverOrNull() {
         return driver.get();
     }
 
     public static void quitDriver() {
 
-        if (driver.get() != null) {
+        WebDriver drv = driver.get();
+
+        if (drv != null) {
 
             try {
-                driver.get().quit();
+
+                drv.quit();
+
             } finally {
+
                 driver.remove();
-                System.out.println("Driver removed from ThreadLocal");
+
+                System.out.println(
+                        "Driver closed and removed from ThreadLocal"
+                );
             }
         }
     }

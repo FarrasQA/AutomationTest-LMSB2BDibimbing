@@ -1,0 +1,7 @@
+mutation createDivision($input: DivisionInput!) {
+  createDivision(input: $input) {
+    id
+    name
+    description
+  }
+}

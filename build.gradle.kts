@@ -24,9 +24,14 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.27.3")
 
     // =====================================================
-    // UI AUTOMATION
+    // UI AUTOMATION (Selenium Core)
     // =====================================================
     implementation("org.seleniumhq.selenium:selenium-java:4.35.0")
+
+    // 🔥 OPTIONAL: DevTools matching Selenium version (FIX CDP WARNING BEST EFFORT)
+    implementation("org.seleniumhq.selenium:selenium-devtools-v139:4.35.0")
+
+    // WebDriver Manager
     implementation("io.github.bonigarcia:webdrivermanager:6.3.2")
 
     // =====================================================
@@ -50,7 +55,6 @@ dependencies {
     // =====================================================
     implementation("org.apache.poi:poi:5.4.1")
     implementation("org.apache.poi:poi-ooxml:5.4.1")
-
     implementation("commons-io:commons-io:2.15.1")
 
     // =====================================================
@@ -68,12 +72,12 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-java:3.2.0")
 
     // =====================================================
-    // SLACK / HTTP CLIENT
+    // HTTP CLIENT
     // =====================================================
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4")
 
     // =====================================================
-    // OPTIONAL UTILITIES
+    // UTILITIES
     // =====================================================
     implementation("org.json:json:20250517")
 }
@@ -95,17 +99,11 @@ tasks.test {
             listOf(file("src/test/resources/suites/$suite"))
 
         if (project.hasProperty("env")) {
-            systemProperty(
-                "env",
-                project.property("env") as String
-            )
+            systemProperty("env", project.property("env") as String)
         }
 
         if (project.hasProperty("browser")) {
-            systemProperty(
-                "browser",
-                project.property("browser") as String
-            )
+            systemProperty("browser", project.property("browser") as String)
         }
     }
 
@@ -127,26 +125,13 @@ tasks.test {
         showStackTraces = true
 
         exceptionFormat =
-            org.gradle.api.tasks.testing.logging
-                .TestExceptionFormat.FULL
+            org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
 
-    // =====================================================
-    // SYSTEM PROPERTIES
-    // =====================================================
-    systemProperty(
-        "file.encoding",
-        "UTF-8"
-    )
+    systemProperty("file.encoding", "UTF-8")
 
-    // =====================================================
-    // MEMORY OPTIMIZATION
-    // =====================================================
     minHeapSize = "512m"
     maxHeapSize = "2048m"
 
-    // =====================================================
-    // ALWAYS RUN TESTS
-    // =====================================================
     outputs.upToDateWhen { false }
 }

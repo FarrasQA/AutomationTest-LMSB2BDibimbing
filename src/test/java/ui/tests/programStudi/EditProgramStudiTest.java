@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 import org.testng.Assert;
 import ui.pages.employeeMenu.EmployeeMenu;
 import ui.pages.programStudi.EditProgramStudi;
-import ui.tests.employeeList.ProgramStudiBaseTest;
 
 
 public class EditProgramStudiTest extends ProgramStudiBaseTest {

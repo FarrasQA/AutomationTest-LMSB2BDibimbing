@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import ui.pages.employeeList.SearchEmployee;
-import ui.test.employeeList.EmployeeBaseTest;
+
 
 public class SearchEmployeeTest extends EmployeeBaseTest {
 

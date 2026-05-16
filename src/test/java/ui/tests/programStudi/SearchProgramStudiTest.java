@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 import ui.pages.programStudi.SearchProgramStudi;
-import ui.tests.employeeList.ProgramStudiBaseTest;
+
 
 public class SearchProgramStudiTest extends ProgramStudiBaseTest {
     private static final Logger log = LoggerFactory.getLogger(SearchProgramStudiTest.class);

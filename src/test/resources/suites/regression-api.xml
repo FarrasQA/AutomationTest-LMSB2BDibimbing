@@ -6,7 +6,7 @@
         <listener class-name="core.TestListener"/>
     </listeners>
 
-    <test name="EmployeeApiRegression" preserve-order="true">
+    <test name="ApiRegression" preserve-order="true">
 
         <groups>
             <run>
@@ -17,7 +17,7 @@
         <classes>
 
             <!-- 1. Create employee -->
-            <class name="api.tests.CreateEmployeeTest">
+            <class name="api.tests.employee.CreateEmployeeTest">
                 <methods>
                     <include name="ts_api_createEmployeeSuccess"/>
                     <include name="ts_api_createEmployeeFailWithEmptyData"/>
@@ -26,7 +26,7 @@
             </class>
 
             <!-- 2. Update employee -->
-            <class name="api.tests.UpdateEmployeeTest">
+            <class name="api.tests.employee.UpdateEmployeeTest">
                 <methods>
                     <include name="ts_api_updateEmployeeSuccess"/>
                     <include name="ts_api_updateEmployeeFailWithEmptyData"/>
@@ -34,23 +34,46 @@
             </class>
 
             <!-- 3. Inactivate employee -->
-            <class name="api.tests.InactivateEmployeeTest">
+            <class name="api.tests.employee.InactivateEmployeeTest">
                 <methods>
                     <include name="ts_api_inactivateEmployeeSuccess"/>
                 </methods>
             </class>
 
             <!-- 4. Activate employee -->
-            <class name="api.tests.ActivateEmployeeTest">
+            <class name="api.tests.employee.ActivateEmployeeTest">
                 <methods>
                     <include name="ts_api_activateEmployeeSuccess"/>
                 </methods>
             </class>
 
             <!-- 5. Delete employee -->
-            <class name="api.tests.DeleteEmployeeTest">
+            <class name="api.tests.employee.DeleteEmployeeTest">
                 <methods>
                     <include name="ts_api_deleteEmployeeSuccess"/>
+                </methods>
+            </class>
+
+            <!-- 6. Create program studi -->
+            <class name="api.tests.division.CreateDivisionTest">
+                <methods>
+                    <include name="ts_api_createDivisionSuccess"/>
+                    <include name="ts_api_createDivisionFailWithEmptyData"/>
+                </methods>
+            </class>
+
+            <!-- 7. Update program studi -->
+            <class name="api.tests.division.UpdateDivisionTest">
+                <methods>
+                    <include name="ts_api_updateDivisionSuccess"/>
+                    <include name="ts_api_updateDivisionFailWithEmptyData"/>
+                </methods>
+            </class>
+
+            <!-- 8. Delete program studi -->
+            <class name="api.tests.division.DeleteDivisionTest">
+                <methods>
+                    <include name="ts_api_deleteDivisionSuccess"/>
                 </methods>
             </class>
 

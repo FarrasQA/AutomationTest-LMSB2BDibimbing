@@ -1,9 +1,8 @@
-package ui.test.employeeList;
+package ui.tests.programStudi;
 
 import core.BaseTest;
 import core.DriverManager;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import ui.pages.auth.Login;
 import ui.pages.employeeMenu.EmployeeMenu;
@@ -16,7 +15,6 @@ public class ProgramStudiBaseTest extends BaseTest {
     @BeforeMethod(alwaysRun = true)
     public void setupEmployeePage() {
 
-        // 1. LOGIN STEP
         login = new Login(DriverManager.getDriver());
 
         login.login(
@@ -29,29 +27,13 @@ public class ProgramStudiBaseTest extends BaseTest {
                 "Login gagal - user tidak masuk dashboard"
         );
 
-        // 2. DEFAULT STATE: EMPLOYEE MENU
         employeeMenu = new EmployeeMenu(DriverManager.getDriver());
 
         employeeMenu.manageEmployeeData();
 
         Assert.assertTrue(
                 employeeMenu.isUserSuccessManageEmployeeData(),
-                "Gagal masuk halaman Manage Employee"
+                "Gagal masuk Employee Menu"
         );
-    }
-
-    @AfterMethod(alwaysRun = true)
-    public void tearDownEmployeeTest() {
-
-        try {
-            // optional safety step sebelum close
-            if (employeeMenu != null) {
-                employeeMenu.manageEmployeeData();
-            }
-        } catch (Exception e) {
-            System.out.println("Ignore navigation error: " + e.getMessage());
-        }
-
-        DriverManager.quitDriver();
     }
 }
