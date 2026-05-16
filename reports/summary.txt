@@ -1,0 +1,4 @@
+PASSED=0
+FAILED=0
+SKIPPED=22
+REPORT_PATH=C:\Users\ASUS\IdeaProjects\AutomationTest-LMSB2BDibimbing/reports/extent-report_2026-05-16_14-17-29.html

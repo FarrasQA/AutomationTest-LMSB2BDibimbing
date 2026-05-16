@@ -1,0 +1,61 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="RegressionApiSuite" verbose="1" preserve-order="true">
+
+    <listeners>
+        <listener class-name="core.TestListener"/>
+    </listeners>
+
+    <test name="EmployeeApiRegression" preserve-order="true">
+
+        <groups>
+            <run>
+                <include name="regression"/>
+            </run>
+        </groups>
+
+        <classes>
+
+            <!-- 1. Create employee -->
+            <class name="api.tests.CreateEmployeeTest">
+                <methods>
+                    <include name="ts_api_createEmployeeSuccess"/>
+                    <include name="ts_api_createEmployeeFailWithEmptyData"/>
+                    <include name="ts_api_createEmployeeFailWithDuplicateData"/>
+                </methods>
+            </class>
+
+            <!-- 2. Update employee -->
+            <class name="api.tests.UpdateEmployeeTest">
+                <methods>
+                    <include name="ts_api_updateEmployeeSuccess"/>
+                    <include name="ts_api_updateEmployeeFailWithEmptyData"/>
+                </methods>
+            </class>
+
+            <!-- 3. Inactivate employee -->
+            <class name="api.tests.InactivateEmployeeTest">
+                <methods>
+                    <include name="ts_api_inactivateEmployeeSuccess"/>
+                </methods>
+            </class>
+
+            <!-- 4. Activate employee -->
+            <class name="api.tests.ActivateEmployeeTest">
+                <methods>
+                    <include name="ts_api_activateEmployeeSuccess"/>
+                </methods>
+            </class>
+
+            <!-- 5. Delete employee -->
+            <class name="api.tests.DeleteEmployeeTest">
+                <methods>
+                    <include name="ts_api_deleteEmployeeSuccess"/>
+                </methods>
+            </class>
+
+        </classes>
+
+    </test>
+
+</suite>

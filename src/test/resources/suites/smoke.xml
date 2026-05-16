@@ -1,0 +1,17 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="SmokeTestSuite" verbose="1">
+    <listeners>
+        <listener class-name="core.TestListener"/>
+    </listeners>
+    <parameter name="browser" value="chrome"/>
+    <test name="FilterByAngkatanTest">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="ui.tests.employeeList.FilterByAngkatanTest"/>
+        </classes>
+    </test>
+</suite>

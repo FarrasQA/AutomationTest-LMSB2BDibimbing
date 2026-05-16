@@ -1,0 +1,1 @@
+{"uuid":"b27919c0-4bd2-4216-93b3-aaaed17ba97a","name":"RegressionApiSuite","children":["94d19033-fa60-4f6d-881f-05a593470138"],"befores":[{"name":"authenticate","status":"passed","stage":"finished","description":"","steps":[],"attachments":[],"parameters":[],"start":1778914971348,"stop":1778914973754}],"afters":[],"start":1778914971325,"stop":1778914976877}

@@ -1,0 +1,106 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="RegressionUiSuite" verbose="1" preserve-order="true">
+
+    <!-- Global Parameters -->
+    <parameter name="browser" value="chrome"/>
+    <parameter name="env" value="staging"/>
+
+    <!-- Listener -->
+    <listeners>
+        <listener class-name="core.TestListener"/>
+    </listeners>
+
+    <!-- Regression Test -->
+    <test name="UiRegression" preserve-order="true">
+
+        <!-- Run only regression group -->
+        <groups>
+            <run>
+                <include name="regression"/>
+            </run>
+        </groups>
+
+        <classes>
+
+            <!-- 1. Add Employee -->
+            <class name="ui.tests.employeeList.AddEmployeeTest">
+                <methods>
+                    <include name="ts_ui_addEmployee1_successAddEmployee"/>
+                    <include name="ts_ui_addEmployee2_failAddEmployeeWithEmptyData"/>
+                    <include name="ts_ui_addEmployee3_failAddEmployeeWithDuplicateData"/>
+                </methods>
+            </class>
+
+            <!-- 2. Edit Employee -->
+            <class name="ui.tests.employeeList.EditEmployeeTest">
+                <methods>
+                    <include name="ts_ui_editEmployee1_editRole"/>
+                    <include name="ts_ui_editEmployee2_editRoleWithEmptyData"/>
+                    <include name="ts_ui_editEmployee3_editActiveToInactiveStatus"/>
+                    <include name="ts_ui_editEmployee4_editInactiveToActiveStatus"/>
+                </methods>
+            </class>
+
+            <!-- 3. Filter Employee By Angkatan -->
+            <class name="ui.tests.employeeList.FilterByAngkatanTest">
+                <methods>
+                    <include name="ts_ui_filterByAngkatan1_filterEmployeeAllAngkatan"/>
+                    <include name="ts_ui_filterByAngkatan2_filterEmployee2024Ganjil"/>
+                    <include name="ts_ui_filterByAngkatan3_filterEmployee2024Genap"/>
+                    <include name="ts_ui_filterByAngkatan4_filterEmployee2025Ganjil"/>
+                    <include name="ts_ui_filterByAngkatan5_filterEmployee2025Genap"/>
+                </methods>
+            </class>
+
+            <!-- 4. Search Employee -->
+            <class name="ui.tests.employeeList.SearchEmployeeTest">
+                <methods>
+                    <include name="ts_ui_searchEmployee1_searchEmployeeByName"/>
+                    <include name="ts_ui_searchEmployee2_searchEmployeeByID"/>
+                    <include name="ts_ui_searchEmployee3_searchEmployeeByEmail"/>
+                </methods>
+            </class>
+
+            <!-- 5. Delete Employee -->
+            <class name="ui.tests.employeeList.DeleteEmployeeTest">
+                <methods>
+                    <include name="ts_ui_deleteEmployee1_successDeleteEmployeeData"/>
+                </methods>
+            </class>
+
+            <!-- 6. Add Program Studi -->
+            <class name="ui.tests.programStudi.AddProgramStudiTest">
+                <methods>
+                    <include name="ts_ui_addProgramStudi1_successAddProgramStudiByFillAllData"/>
+                    <include name="ts_ui_addProgramStudi2_failAddProgamStudiWithEmptyData"/>
+                </methods>
+            </class>
+
+            <!-- 7. Edit Program Studi -->
+            <class name="ui.tests.programStudi.EditProgramStudiTest">
+                <methods>
+                    <include name="ts_ui_editProgramStudi1_successEditProgramStudiDescription"/>
+                    <include name="ts_ui_editProgramStudi2_failEditProgramStudiWithEmptyDescription"/>
+                </methods>
+            </class>
+
+            <!-- 8. Search Program Studi -->
+            <class name="ui.tests.programStudi.SearchProgramStudiTest">
+                <methods>
+                    <include name="ts_ui_searchProgramStudi1_successSearchProgramStudi"/>
+                </methods>
+            </class>
+
+            <!-- 9. Delete Program Studi -->
+            <class name="ui.tests.programStudi.DeleteProgramStudiTest">
+                <methods>
+                    <include name="ts_ui_deleteProgramStudi1_successDeleteProgramStudi"/>
+                </methods>
+            </class>
+
+        </classes>
+
+    </test>
+
+</suite>
