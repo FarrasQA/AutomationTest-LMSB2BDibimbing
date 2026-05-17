@@ -59,7 +59,7 @@ public class AddEmployeeTest extends EmployeeBaseTest {
         AddEmployee addEmployee =
                 new AddEmployee(DriverManager.getDriver());
 
-        addEmployee.addEmployee(
+        addEmployee.addEmployeeWithDuplicateData(
                 config.getProperty("employeeName"),
                 config.getProperty("employeeID"),
                 config.getProperty("employeeEmail"),
