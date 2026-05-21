@@ -1,18 +1,18 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 
-<suite name="Regression Suite">
+<suite name="Automation Master Suite"
+       verbose="1"
+       preserve-order="true"
+       parallel="false">
 
-    <listeners>
-        <listener class-name="core.TestListener"/>
-    </listeners>
+    <suite-files>
 
-    <test name="Automation Test">
+        <!-- API Regression -->
+        <suite-file path="regression-api.xml"/>
 
-        <packages>
-            <package name="ui.tests"/>
-            <package name="api.tests"/>
-        </packages>
+        <!-- UI Regression -->
+        <suite-file path="regression-ui.xml"/>
 
-    </test>
+    </suite-files>
 
 </suite>

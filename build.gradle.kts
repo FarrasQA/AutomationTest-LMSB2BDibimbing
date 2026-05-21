@@ -6,8 +6,12 @@ group = "org.example"
 version = "1.0-SNAPSHOT"
 
 java {
+
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+
+        languageVersion.set(
+            JavaLanguageVersion.of(17)
+        )
     }
 }
 
@@ -20,96 +24,158 @@ dependencies {
     // =====================================================
     // TEST FRAMEWORK
     // =====================================================
-    testImplementation("org.testng:testng:7.11.0")
-    testImplementation("org.assertj:assertj-core:3.27.3")
+    testImplementation(
+        "org.testng:testng:7.11.0"
+    )
+
+    testImplementation(
+        "org.assertj:assertj-core:3.27.3"
+    )
 
     // =====================================================
-    // UI AUTOMATION (Selenium Core)
+    // UI AUTOMATION
     // =====================================================
-    implementation("org.seleniumhq.selenium:selenium-java:4.35.0")
+    implementation(
+        "org.seleniumhq.selenium:selenium-java:4.35.0"
+    )
 
-    // 🔥 OPTIONAL: DevTools matching Selenium version (FIX CDP WARNING BEST EFFORT)
-    implementation("org.seleniumhq.selenium:selenium-devtools-v139:4.35.0")
+    // FIX CDP WARNING
+    implementation(
+        "org.seleniumhq.selenium:selenium-devtools-v139:4.35.0"
+    )
 
-    // WebDriver Manager
-    implementation("io.github.bonigarcia:webdrivermanager:6.3.2")
+    implementation(
+        "io.github.bonigarcia:webdrivermanager:6.3.2"
+    )
 
     // =====================================================
     // API AUTOMATION
     // =====================================================
-    testImplementation("io.rest-assured:rest-assured:5.5.0")
+    testImplementation(
+        "io.rest-assured:rest-assured:5.5.0"
+    )
 
     // =====================================================
     // JSON
     // =====================================================
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
+    implementation(
+        "com.fasterxml.jackson.core:jackson-databind:2.17.1"
+    )
 
     // =====================================================
     // REPORTING
     // =====================================================
-    implementation("com.aventstack:extentreports:5.1.2")
-    testImplementation("io.qameta.allure:allure-testng:2.29.0")
+    implementation(
+        "com.aventstack:extentreports:5.1.2"
+    )
+
+    testImplementation(
+        "io.qameta.allure:allure-testng:2.29.0"
+    )
 
     // =====================================================
     // FILE / EXCEL
     // =====================================================
-    implementation("org.apache.poi:poi:5.4.1")
-    implementation("org.apache.poi:poi-ooxml:5.4.1")
-    implementation("commons-io:commons-io:2.15.1")
+    implementation(
+        "org.apache.poi:poi:5.4.1"
+    )
+
+    implementation(
+        "org.apache.poi:poi-ooxml:5.4.1"
+    )
+
+    implementation(
+        "commons-io:commons-io:2.15.1"
+    )
 
     // =====================================================
     // LOGGING
     // =====================================================
-    implementation("org.apache.logging.log4j:log4j-api:2.25.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.25.1")
+    implementation(
+        "org.apache.logging.log4j:log4j-api:2.25.1"
+    )
 
-    implementation("org.slf4j:slf4j-api:2.0.13")
-    implementation("org.slf4j:slf4j-simple:2.0.13")
+    implementation(
+        "org.apache.logging.log4j:log4j-core:2.25.1"
+    )
+
+    implementation(
+        "org.slf4j:slf4j-api:2.0.13"
+    )
+
+    implementation(
+        "org.slf4j:slf4j-simple:2.0.13"
+    )
 
     // =====================================================
     // ENVIRONMENT VARIABLE
     // =====================================================
-    implementation("io.github.cdimascio:dotenv-java:3.2.0")
+    implementation(
+        "io.github.cdimascio:dotenv-java:3.2.0"
+    )
 
     // =====================================================
     // HTTP CLIENT
     // =====================================================
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4")
+    implementation(
+        "org.apache.httpcomponents.client5:httpclient5:5.4"
+    )
 
     // =====================================================
     // UTILITIES
     // =====================================================
-    implementation("org.json:json:20250517")
+    implementation(
+        "org.json:json:20250517"
+    )
 }
 
 tasks.test {
 
-    useTestNG {
+    useTestNG() {
 
-        val suite: String =
-            if (project.hasProperty("suite")) {
-                project.property("suite") as String
-            } else {
-                "smoke.xml"
-            }
+        // =================================================
+        // DYNAMIC SUITE SUPPORT
+        // =================================================
+
+        val suite =
+            System.getProperty(
+                "suite",
+                "testng.xml"
+            )
 
         println("Run test suite: $suite")
 
-        suiteXmlFiles =
-            listOf(file("src/test/resources/suites/$suite"))
+        suites(suite)
 
-        if (project.hasProperty("env")) {
-            systemProperty("env", project.property("env") as String)
-        }
+        // =================================================
+        // ENVIRONMENT
+        // =================================================
 
-        if (project.hasProperty("browser")) {
-            systemProperty("browser", project.property("browser") as String)
-        }
+        systemProperty(
+            "env",
+            System.getProperty(
+                "env",
+                "staging"
+            )
+        )
+
+        // =================================================
+        // BROWSER
+        // =================================================
+
+        systemProperty(
+            "browser",
+            System.getProperty(
+                "browser",
+                "chrome"
+            )
+        )
     }
 
     // =====================================================
     // TEST LOGGING
     // =====================================================
+
     testLogging {
 
         events(
@@ -125,13 +191,22 @@ tasks.test {
         showStackTraces = true
 
         exceptionFormat =
-            org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+            org.gradle.api.tasks.testing.logging
+                .TestExceptionFormat.FULL
     }
 
-    systemProperty("file.encoding", "UTF-8")
+    // =====================================================
+    // JVM CONFIG
+    // =====================================================
+
+    systemProperty(
+        "file.encoding",
+        "UTF-8"
+    )
 
     minHeapSize = "512m"
     maxHeapSize = "2048m"
 
+    // ALWAYS RERUN TEST
     outputs.upToDateWhen { false }
 }

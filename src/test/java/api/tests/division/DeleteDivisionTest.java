@@ -11,10 +11,7 @@ import org.testng.annotations.Test;
 public class DeleteDivisionTest
         extends BaseAuthenticatedTest {
 
-    @Test(
-            priority = 1,
-            groups = {"smoke", "regression"}
-    )
+    @Test(priority = 1, groups = {"smoke", "regression"})
     public void ts_api_deleteDivisionSuccess() {
 
         Assert.assertNotNull(
