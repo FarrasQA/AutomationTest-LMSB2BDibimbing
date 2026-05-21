@@ -4,9 +4,6 @@ on:
 
   workflow_dispatch:
 
-  schedule:
-    - cron: '0 17 * * *'
-
 jobs:
 
   automation-test:
@@ -69,7 +66,7 @@ jobs:
           status: custom
           custom_payload: |
             {
-              "text": "🚀 *Automation Full Regression Result*\n\n✅ Passed: ${{ env.PASSED }}\n❌ Failed: ${{ env.FAILED }}\n⚠️ Skipped: ${{ env.SKIPPED }}\n\n📄 Extent Report dan screenshot evidence berhasil diupload."
+              "text": "🚀 *Automation Full Regression Result*\n\n✅ Passed: ${{ env.PASSED }}\n❌ Failed: ${{ env.FAILED }}\n⚠️ Skipped: ${{ env.SKIPPED }}\n\n📄 Extent Report:\nhttps://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\n\n📸 Screenshot evidence tersedia di GitHub Artifacts."
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
