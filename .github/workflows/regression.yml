@@ -1,17 +1,16 @@
 name: Automation Regression Test
 
 on:
-
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-
   automation-test:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -31,17 +30,30 @@ jobs:
         run: ./gradlew clean test -Dsuite=testng.xml
         continue-on-error: true
 
-      - name: Read Summary
+      - name: Read Summary & Setup Variables
         if: always()
         run: |
-
-          PASSED=$(grep PASSED reports/summary.txt | cut -d '=' -f2)
-          FAILED=$(grep FAILED reports/summary.txt | cut -d '=' -f2)
-          SKIPPED=$(grep SKIPPED reports/summary.txt | cut -d '=' -f2)
+          # Membaca hasil dari text summary
+          PASSED=$(grep PASSED reports/summary.txt | cut -d '=' -f2 || echo "0")
+          FAILED=$(grep FAILED reports/summary.txt | cut -d '=' -f2 || echo "0")
+          SKIPPED=$(grep SKIPPED reports/summary.txt | cut -d '=' -f2 || echo "0")
 
           echo "PASSED=$PASSED" >> $GITHUB_ENV
           echo "FAILED=$FAILED" >> $GITHUB_ENV
           echo "SKIPPED=$SKIPPED" >> $GITHUB_ENV
+          
+          # Set warna untuk Slack
+          if [ "$FAILED" -eq "0" ]; then
+            echo "COLOR=#2EB67D" >> $GITHUB_ENV
+            echo "STATUS_MSG=SUCCESS ✅" >> $GITHUB_ENV
+          else
+            echo "COLOR=#E01E5A" >> $GITHUB_ENV
+            echo "STATUS_MSG=FAILED ❌" >> $GITHUB_ENV
+          fi
+          
+          # Membuat URL GitHub Pages secara otomatis (Format: https://owner.github.io/repo-name)
+          REPO_NAME=$(echo ${{ github.repository }} | cut -d'/' -f2)
+          echo "GH_PAGES_URL=https://${{ github.repository_owner }}.github.io/$REPO_NAME/" >> $GITHUB_ENV
 
       - name: Upload Screenshots Artifact
         if: always()
@@ -51,13 +63,14 @@ jobs:
           path: reports/screenshots/
           if-no-files-found: ignore
 
-      - name: Upload Extent Report Artifact
+      #Deploy ke GitHub Pages
+      - name: Deploy Report to GitHub Pages
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          name: extent-report
-          path: reports/
-          if-no-files-found: ignore
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./reports
+          force_orphan: true # Agar branch gh-pages tidak penuh dengan history, hanya menyimpan report terakhir
 
       - name: Send Slack Summary
         if: always()
@@ -66,25 +79,52 @@ jobs:
           status: custom
           custom_payload: |
             {
-              "text": "🚀 *Automation Full Regression Result*\n\n✅ Passed: ${{ env.PASSED }}\n❌ Failed: ${{ env.FAILED }}\n⚠️ Skipped: ${{ env.SKIPPED }}\n\n📄 Extent Report:\nhttps://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\n\n📸 Screenshot evidence tersedia di GitHub Artifacts."
+              "attachments": [{
+                "color": "${{ env.COLOR }}",
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "🚀 Automation Full Regression Result",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Status:* ${{ env.STATUS_MSG }}\n*Total Tests:* 35\n\n✅ *Passed:* ${{ env.PASSED }}\n❌ *Failed:* ${{ env.FAILED }}\n⚠️ *Skipped:* ${{ env.SKIPPED }}"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "🌐 *Extent Report Detail:*\n<${{ env.GH_PAGES_URL }}|Klik di sini untuk melihat Report Interaktif>"
+                    }
+                  },
+                  {
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "Report mungkin membutuhkan waktu 1-2 menit untuk ter-update di web setelah notifikasi ini muncul."
+                      }
+                    ]
+                  }
+                ]
+              }]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
-      - name: Upload Extent Report To Slack
-        if: always()
-        uses: MeilCli/slack-upload-file@v4
-        with:
-          slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-          file_path: reports/
-          initial_comment: "📄 Automation Extent Report"
-
+      # Step ini dipertahankan HANYA untuk mengirim screenshot gagal, upload file HTML dihapus
       - name: Upload Failed Screenshots To Slack
-        if: always()
+        if: env.FAILED > 0
         uses: MeilCli/slack-upload-file@v4
         with:
           slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
           channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-          file_path: reports/screenshots/
+          file_path: 'reports/screenshots/*.png'
           initial_comment: "📸 Failed Test Evidence"
