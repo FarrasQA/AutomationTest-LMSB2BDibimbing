@@ -119,7 +119,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
-      # Step ini dipertahankan HANYA untuk mengirim screenshot gagal, upload file HTML dihapus
+
       - name: Upload Failed Screenshots To Slack
         if: env.FAILED > 0
         uses: MeilCli/slack-upload-file@v4
