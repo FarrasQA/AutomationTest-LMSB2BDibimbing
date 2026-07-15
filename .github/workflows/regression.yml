@@ -4,11 +4,21 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
 
 jobs:
   automation-test:
     runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout Repository
@@ -18,7 +28,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: "17"
+          cache: gradle
 
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
@@ -30,10 +41,31 @@ jobs:
         run: ./gradlew clean test -Dsuite=testng.xml
         continue-on-error: true
 
-      - name: Read Summary & Setup Variables
+      ##########################################################
+      # DEBUG REPORT
+      ##########################################################
+
+      - name: Verify Generated Report
         if: always()
         run: |
-          # Membaca hasil dari text summary
+          echo "========== CURRENT DIRECTORY =========="
+          pwd
+
+          echo ""
+          echo "========== REPORTS =========="
+          ls -lah reports || true
+
+          echo ""
+          echo "========== REPORT FILES =========="
+          find reports -type f || true
+
+      ##########################################################
+      # READ SUMMARY
+      ##########################################################
+
+      - name: Read Summary
+        if: always()
+        run: |
           PASSED=$(grep PASSED reports/summary.txt | cut -d '=' -f2 || echo "0")
           FAILED=$(grep FAILED reports/summary.txt | cut -d '=' -f2 || echo "0")
           SKIPPED=$(grep SKIPPED reports/summary.txt | cut -d '=' -f2 || echo "0")
@@ -41,8 +73,7 @@ jobs:
           echo "PASSED=$PASSED" >> $GITHUB_ENV
           echo "FAILED=$FAILED" >> $GITHUB_ENV
           echo "SKIPPED=$SKIPPED" >> $GITHUB_ENV
-          
-          # Set warna untuk Slack
+
           if [ "$FAILED" -eq "0" ]; then
             echo "COLOR=#2EB67D" >> $GITHUB_ENV
             echo "STATUS_MSG=SUCCESS ✅" >> $GITHUB_ENV
@@ -50,12 +81,20 @@ jobs:
             echo "COLOR=#E01E5A" >> $GITHUB_ENV
             echo "STATUS_MSG=FAILED ❌" >> $GITHUB_ENV
           fi
-          
-          # Membuat URL GitHub Pages secara otomatis (Format: https://owner.github.io/repo-name)
-          REPO_NAME=$(echo ${{ github.repository }} | cut -d'/' -f2)
-          echo "GH_PAGES_URL=https://${{ github.repository_owner }}.github.io/$REPO_NAME/" >> $GITHUB_ENV
 
-      - name: Upload Screenshots Artifact
+      ##########################################################
+      # SAVE REPORT ARTIFACT
+      ##########################################################
+
+      - name: Upload Extent Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report
+          path: reports/
+          if-no-files-found: error
+
+      - name: Upload Failed Screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -63,62 +102,67 @@ jobs:
           path: reports/screenshots/
           if-no-files-found: ignore
 
-      #Deploy ke GitHub Pages
-      - name: Deploy Report to GitHub Pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./reports
-          force_orphan: true # Agar branch gh-pages tidak penuh dengan history, hanya menyimpan report terakhir
+      ##########################################################
+      # DEPLOY TO GITHUB PAGES
+      ##########################################################
 
-      - name: Send Slack Summary
+      - name: Upload GitHub Pages Artifact
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: reports/
+
+      - name: Deploy to GitHub Pages
+        if: always()
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      ##########################################################
+      # SLACK NOTIFICATION
+      ##########################################################
+
+      - name: Send Slack Notification
         if: always()
         uses: 8398a7/action-slack@v3
         with:
           status: custom
           custom_payload: |
             {
-              "attachments": [{
-                "color": "${{ env.COLOR }}",
-                "blocks": [
-                  {
-                    "type": "header",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "🚀 Automation Full Regression Result",
-                      "emoji": true
-                    }
-                  },
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "*Status:* ${{ env.STATUS_MSG }}\n*Total Tests:* 35\n\n✅ *Passed:* ${{ env.PASSED }}\n❌ *Failed:* ${{ env.FAILED }}\n⚠️ *Skipped:* ${{ env.SKIPPED }}"
-                    }
-                  },
-                  {
-                    "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "🌐 *Extent Report Detail:*\n<${{ env.GH_PAGES_URL }}|Klik di sini untuk melihat Report Interaktif>"
-                    }
-                  },
-                  {
-                    "type": "context",
-                    "elements": [
-                      {
-                        "type": "mrkdwn",
-                        "text": "Report mungkin membutuhkan waktu 1-2 menit untuk ter-update di web setelah notifikasi ini muncul."
+              "attachments": [
+                {
+                  "color": "${{ env.COLOR }}",
+                  "blocks": [
+                    {
+                      "type": "header",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "🚀 Automation Regression Result"
                       }
-                    ]
-                  }
-                ]
-              }]
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Status:* ${{ env.STATUS_MSG }}\n\n✅ *Passed:* ${{ env.PASSED }}\n❌ *Failed:* ${{ env.FAILED }}\n⚠️ *Skipped:* ${{ env.SKIPPED }}"
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "🌐 *Extent Report*\n<${{ steps.deployment.outputs.page_url }}|Open Interactive Report>"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
+      ##########################################################
+      # FAILED SCREENSHOTS TO SLACK
+      ##########################################################
 
       - name: Upload Failed Screenshots To Slack
         if: env.FAILED > 0
@@ -126,5 +170,5 @@ jobs:
         with:
           slack_token: ${{ secrets.SLACK_BOT_TOKEN }}
           channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-          file_path: 'reports/screenshots/*.png'
+          file_path: reports/screenshots/*.png
           initial_comment: "📸 Failed Test Evidence"

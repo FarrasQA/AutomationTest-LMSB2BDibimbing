@@ -51,12 +51,8 @@ public class TestListener implements ITestListener {
                 context.getName()
         );
 
-        String timestamp =
-                new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
-                        .format(new Date());
-
         String reportPath =
-                REPORT_DIR + "extent-report_" + timestamp + ".html";
+                REPORT_DIR + "index.html";
 
         latestReportPath = reportPath;
 

@@ -120,7 +120,6 @@ public class DriverManager {
         return drv;
     }
 
-    // TAMBAHAN BARU UNTUK API AUTOMATION
     public static WebDriver getDriverOrNull() {
         return driver.get();
     }
