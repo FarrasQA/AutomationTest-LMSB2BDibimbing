@@ -53,8 +53,10 @@ jobs:
 
       - name: Run Full Regression
         run: |
-          ./gradlew clean test -Dsuite=testng.xml --rerun-tasks --no-build-cache
-        continue-on-error: true
+          ./gradlew clean test \
+            -Dsuite=src/test/resources/suites/testng.xml \
+            --rerun-tasks \
+            --no-build-cache
 
       ##########################################################
       # DEBUG REPORT

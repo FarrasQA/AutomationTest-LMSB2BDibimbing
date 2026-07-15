@@ -140,7 +140,7 @@ tasks.test {
         val suite =
             System.getProperty(
                 "suite",
-                "testng.xml"
+                "src/test/resources/suites/testng.xml"
             )
 
         println("Run test suite: $suite")
