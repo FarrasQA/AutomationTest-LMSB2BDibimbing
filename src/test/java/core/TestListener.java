@@ -56,6 +56,11 @@ public class TestListener implements ITestListener {
 
         latestReportPath = reportPath;
 
+        System.out.println("======================================");
+        System.out.println("TEST LISTENER EXECUTED");
+        System.out.println("REPORT PATH = " + reportPath);
+        System.out.println("======================================");
+
         ExtentSparkReporter sparkReporter =
                 new ExtentSparkReporter(reportPath);
 
@@ -239,6 +244,10 @@ public class TestListener implements ITestListener {
                 failedCount,
                 skippedCount
         );
+
+        System.out.println("======================================");
+        System.out.println("EXTENT FLUSH");
+        System.out.println("======================================");
 
         if (extent != null) {
             extent.flush();

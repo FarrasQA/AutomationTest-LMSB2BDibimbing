@@ -31,6 +31,20 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      - name: Verify TestListener Source
+        run: |
+          echo "===== TestListener ====="
+          sed -n '1,120p' src/test/java/core/TestListener.java
+          echo ""
+          echo "===== Search reportPath ====="
+          grep -n "index.html" src/test/java/core/TestListener.java || true
+          grep -n "extent-report_" src/test/java/core/TestListener.java || true
+
+      - name: Clean Reports Directory
+        run: |
+          rm -rf reports
+          mkdir -p reports    
+
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
 
@@ -38,7 +52,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Full Regression
-        run: ./gradlew clean test -Dsuite=testng.xml
+        run: |
+          ./gradlew clean test -Dsuite=testng.xml --rerun-tasks --no-build-cache
         continue-on-error: true
 
       ##########################################################
@@ -48,16 +63,20 @@ jobs:
       - name: Verify Generated Report
         if: always()
         run: |
-          echo "========== CURRENT DIRECTORY =========="
-          pwd
-
-          echo ""
           echo "========== REPORTS =========="
           ls -lah reports || true
 
           echo ""
           echo "========== REPORT FILES =========="
           find reports -type f || true
+
+          echo ""
+          echo "========== INDEX CHECK =========="
+          if [ -f reports/index.html ]; then
+            echo "index.html FOUND"
+          else
+            echo "index.html NOT FOUND"
+          fi
 
       ##########################################################
       # READ SUMMARY
